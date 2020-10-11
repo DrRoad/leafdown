@@ -99,7 +99,7 @@
 <div id="the-map-itself" class="section level2">
 <h2 class="hasAnchor">
 <a href="#the-map-itself" class="anchor"></a>The Map itself</h2>
-<p>The structure of the map is pretty similar to the map from the Introduction article. Here we show the results of the US Presidential Election from 2016.</p>
+<p>The structure of the map is pretty similar to the map from the <a href="https://hoga-it.github.io/leafdown/articles/Introduction.html">Introduction article.</a>. Here we show the results of the US Presidential Election from 2016.</p>
 </div>
 <div id="connecting-graphs-to-our-map" class="section level2">
 <h2 class="hasAnchor">
@@ -240,6 +240,27 @@
   <span class="op">)</span>
 <span class="op">)</span>
 
+<span class="va">percent</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">digits</span> <span class="op">=</span> <span class="fl">2</span>, <span class="va">format</span> <span class="op">=</span> <span class="st">"f"</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span>      <span class="co"># Create user-defined function</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/formatc.html">formatC</a></span><span class="op">(</span><span class="va">x</span> <span class="op">*</span> <span class="fl">100</span>, format <span class="op">=</span> <span class="va">format</span>, digits <span class="op">=</span> <span class="va">digits</span>, <span class="va">...</span><span class="op">)</span>, <span class="st">"%"</span><span class="op">)</span>
+<span class="op">}</span>
+
+<span class="va">create_labels</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">map_level</span><span class="op">)</span> <span class="op">{</span>
+  <span class="va">labels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span><span class="op">(</span>
+    <span class="st">"&lt;strong&gt;%s&lt;/strong&gt;&lt;br/&gt;
+    Democrats: %s&lt;br/&gt;
+    Republicans: %s&lt;br/&gt;
+    Libertarians: %s&lt;br/&gt;
+    Green: %s&lt;br/&gt;
+    &lt;/sup&gt;"</span>,
+    <span class="va">data</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"NAME_"</span>, <span class="va">map_level</span><span class="op">)</span><span class="op">]</span>,
+    <span class="fu">percent</span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">Democrats2016</span><span class="op">)</span>,
+    <span class="fu">percent</span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">Republicans2016</span><span class="op">)</span>,
+    <span class="fu">percent</span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">Libertarians2016</span><span class="op">)</span>,
+    <span class="fu">percent</span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">Green2016</span><span class="op">)</span>
+  <span class="op">)</span>
+  <span class="va">labels</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span><span class="op">(</span><span class="fu">htmltools</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/htmltools/man/HTML.html">HTML</a></span><span class="op">)</span>
+<span class="op">}</span>
+
 <span class="co"># Define server for leafdown app</span>
 <span class="va">server</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">input</span>, <span class="va">output</span><span class="op">)</span> <span class="op">{</span>
   <span class="co"># load the shapes for the two levels</span>
@@ -296,11 +317,11 @@
 
     <span class="co"># add the data back to the leafdown object</span>
     <span class="va">my_leafdown</span><span class="op">$</span><span class="fu">add_data</span><span class="op">(</span><span class="va">data</span><span class="op">)</span>
-
+    <span class="va">labels</span> <span class="op">&lt;-</span> <span class="fu">create_labels</span><span class="op">(</span><span class="va">data</span>, <span class="va">my_leafdown</span><span class="op">$</span><span class="va">curr_map_level</span><span class="op">)</span>
     <span class="co"># draw the leafdown object</span>
     <span class="va">my_leafdown</span><span class="op">$</span><span class="fu">draw_leafdown</span><span class="op">(</span>
       fillColor <span class="op">=</span> <span class="op">~</span><span class="fu">fillcolor</span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">y</span><span class="op">)</span>,
-      weight <span class="op">=</span> <span class="fl">3</span>, fillOpacity <span class="op">=</span> <span class="fl">1</span>, color <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+      weight <span class="op">=</span> <span class="fl">3</span>, fillOpacity <span class="op">=</span> <span class="fl">1</span>, color <span class="op">=</span> <span class="st">"white"</span>, label <span class="op">=</span> <span class="va">labels</span><span class="op">)</span> <span class="op">%&gt;%</span>
       <span class="co"># set the view to be center on the USA</span>
       <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-methods.html">setView</a></span><span class="op">(</span><span class="op">-</span><span class="fl">95</span>, <span class="fl">39</span>,  <span class="fl">4</span><span class="op">)</span>  <span class="op">%&gt;%</span>
       <span class="co"># add a nice legend</span>
@@ -354,7 +375,7 @@
       <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span>
         <span class="va">df</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"County"</span>, <span class="st">"Democrats2016"</span>, <span class="st">"Republicans2016"</span>, <span class="st">"Libertarians2016"</span>, <span class="st">"Green2016"</span><span class="op">)</span><span class="op">]</span>
         <span class="va">df</span> <span class="op">&lt;-</span> <span class="va">df</span> <span class="op">%&gt;%</span> <span class="fu">pivot_longer</span><span class="op">(</span><span class="fl">2</span><span class="op">:</span><span class="fl">5</span>, <span class="st">"party"</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">party</span><span class="op">)</span>
-        <span class="va">df</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">$</span><span class="va">value</span> <span class="op">/</span> <span class="fl">100</span>
+        <span class="va">df</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">$</span><span class="va">value</span>
         <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="st">"ST"</span>
       <span class="op">}</span>
     <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span>
