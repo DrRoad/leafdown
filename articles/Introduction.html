@@ -75,7 +75,8 @@
 
       
 
-      </header><script src="Introduction_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="Introduction_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="Introduction_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
+<script src="Introduction_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Introduction</h1>
@@ -108,7 +109,7 @@ The goal is to create a map that:</p>
 <a href="#spatialpolygonsdataframes" class="anchor"></a>SpatialPolygonsDataFrames</h2>
 <p><code>leafdown</code> requires a list of SpatialPolygonsDataFrames (spdfs) for the regions we want to display on our map.</p>
 <p>To get these spdfs we can use the <code>getData</code> function of the <code>raster</code> package. For “Germany”, <code>level = 1</code> contains the spdf for the federal states and <code>level = 2</code> the spdf for the administrative districts.</p>
-<p>If an <code>spdf</code> comes from a different source, it is important that the structure is identical to the <code>spdfs</code> that come from the <code>raster</code> package. It is especially important that the data of both <code>spdfs</code> have a column <code>GID_1</code> that indicates which subregions correspond to the regions of the first map level.</p>
+<p>If an <code>spdf</code> comes from a different source, it is important that the structure is identical to the <code>spdfs</code> that come from the <code>raster</code> package.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit">
 <span class="va">ger1</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/getData.html">getData</a></span><span class="op">(</span>country <span class="op">=</span> <span class="st">"Germany"</span>, level <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
 <span class="va">ger2</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/getData.html">getData</a></span><span class="op">(</span>country <span class="op">=</span> <span class="st">"Germany"</span>, level <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></pre></div>
@@ -173,6 +174,9 @@ For this we have to specify the:</p>
 </li>
 <li>
 <code>input</code>: The <code>input</code> from the shiny app</li>
+<li>
+<code>join_map_levels_by</code> (optional). A named vector with the columns by which the map levels should be joined. By default this is set to c(“GID_1” = “GID_1”), which is appropriate when ‘Provinces/States’ is the first and ‘Districts’ the second map level. If you use ‘Countries’ as first and ‘Provinces/States’ as second level you have to set it to <code><a href="https://rdrr.io/r/base/c.html">c("ISO" = "GID_0")</a></code>
+</li>
 </ul>
 <div class="sourceCode" id="cb8"><pre class="downlit">
 <span class="va">my_leafdown</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/Leafdown.html">Leafdown</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">spdfs_list</span>, map_output_id <span class="op">=</span> <span class="st">"leafdown"</span>, input <span class="op">=</span> <span class="va">input</span><span class="op">)</span></pre></div>
@@ -180,7 +184,7 @@ For this we have to specify the:</p>
 <div id="data-1" class="section level3">
 <h3 class="hasAnchor">
 <a href="#data-1" class="anchor"></a>Data</h3>
-<p>In the next step, we add data to our <code>leafdown</code> object. Using the attribute <code>$curr_data</code> we can retrieve the data of the current map level. With metadata, we refer to the data that describes the polygons, such as region names, region IDs, etc. The metadata is automatically set with the <code>spdf_list[[i]]@data</code> where i is the current map level.</p>
+<p>In the next step, we add data to our <code>leafdown</code> object. Using the attribute <code>$curr_data</code> we can retrieve the data of the current map level. At the beginning <code>$curr_data</code> only contains metadata. With metadata, we refer to the data that describes the polygons, such as region names, region IDs, etc. The metadata is automatically set with the <code>spdf_list[[i]]@data</code> where <code>i</code> is the current map level.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit">
 <span class="va">metadata</span> <span class="op">&lt;-</span> <span class="va">my_leafdown</span><span class="op">$</span><span class="va">curr_data</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">metadata</span><span class="op">)</span><span class="op">)</span>
